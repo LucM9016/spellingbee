@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee Practice</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka One', cursive;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #fff7c0, #ffec8b);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+
+    #game-wrapper {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    #game-container {
+      text-align: center;
+      background: #fff9d1;
+      border: 10px solid #ffd700;
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1.5s ease forwards;
+      width: 100%;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #e8b100;
+    }
+
+    #word-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 1rem 0;
+    }
+
+    #word-display {
+      font-size: 1.8rem;
+      color: #555;
+      font-weight: 700;
+    }
+
+    #hear-btn {
+      padding: 8px 14px;
+      font-size: 1rem;
+      background-color: #ffd700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+
+    #hear-btn:hover {
+      background-color: #e8b100;
+    }
+
+    #user-input {
+      font-size: 1.8rem;
+      margin: 20px 0;
+      padding: 10px;
+      border: 3px solid #e8b100;
+      border-radius: 10px;
+      background-color: #fff;
+      width: 80%;
+      user-select: none;
+    }
+
+    #input-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      user-select: none;
+    }
+
+    #input-area > div {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .key {
+      min-width: 40px;
+      height: 50px;
+      background-color: #ffe36e;
+      border: 2px solid #d8a700;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 700;
+      color: #5a4b00;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+    }
+
+    .key:hover {
+      background-color: #ffdd44;
+      transform: translateY(-2px);
+    }
+
+    .key:active {
+      transform: translateY(0);
+    }
+
+    .key.shift-key {
+      background-color: #ffa500;
+      min-width: 60px;
+    }
+
+    .key.shift-key.active {
+      background-color: #ff8c00;
+      color: white;
+    }
+
+    .key.spacebar {
+      min-width: 200px;
+      background-color: #87ceeb;
+    }
+
+    .key.spacebar:hover {
+      background-color: #6bb6db;
+    }
+
+    .key.hyphen {
+      background-color: #dda0dd;
+    }
+
+    .key.hyphen:hover {
+      background-color: #da70d6;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: space-between;
+      max-width: 400px;
+      margin: 15px auto 0;
+      gap: 20px;
+    }
+
+    #controls button {
+      flex: 1;
+      padding: 12px 0;
+      font-size: 1.1rem;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      border: none;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    #controls button#clear-btn {
+      background-color: #d9534f;
+    }
+
+    #controls button#clear-btn:hover {
+      background-color: #c9302c;
+    }
+
+    #controls button#check-btn {
+      background-color: #5cb85c;
+    }
+
+    #controls button#check-btn:hover {
+      background-color: #449d44;
+    }
+
+    #hud {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #5a4b00;
+      user-select: none;
+    }
+
+    #scoreboard {
+      margin-top: 30px;
+      background: #fffef4;
+      border: 6px solid #ffd700;
+      border-radius: 15px;
+      padding: 20px 25px;
+      color: #5a4b00;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    #scoreboard h2 {
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+      text-align: center;
+      color: #e8b100;
+    }
+
+    #scoreboard ul {
+      list-style: none;
+    }
+
+    #scoreboard li {
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #ffd700;
+    }
+
+    .correct {
+      color: #5cb85c;
+    }
+
+    .incorrect {
+      color: #d9534f;
+    }
+
+    .second-try {
+      color: #f0ad4e;
+    }
+
+    .score-update {
+      animation: point-bounce 0.5s ease forwards;
+    }
+
+    @keyframes point-bounce {
+      0% {
+        transform: scale(1);
+        color: #5cb85c;
+      }
+
+      50% {
+        transform: scale(1.3);
+        color: #7bed7b;
+      }
+
+      100% {
+        transform: scale(1);
+        color: #5cb85c;
+      }
+    }
+
+    #start-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: #fff9d1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      user-select: none;
+    }
+
+    #start-screen h1 {
+      color: #e8b100;
+      font-size: 4rem;
+      margin-bottom: 2rem;
+    }
+
+    #start-screen button {
+      padding: 15px 30px;
+      font-size: 1.5rem;
+      border-radius: 15px;
+      background-color: #ffe36e;
+      border: 2px solid #d8a700;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.3s;
+    }
+
+    #start-screen button:hover {
+      background-color: #e8b100;
+      color: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .key {
+        min-width: 35px;
+        height: 45px;
+        font-size: 1rem;
+      }
+      
+      .key.spacebar {
+        min-width: 150px;
+      }
+      
+      #input-area > div {
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="start-screen">
+    <h1>Edgar Morin - Spelling Bee 2025</h1>
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <div id="game-wrapper">
+    <div id="game-container" style="display:none">
+      <h1>Spelling Bee</h1>
+      <div id="hud">
+        <div>Correctas: <span id="correct-count">0</span></div>
+        <div>Incorrectas: <span id="incorrect-count">0</span></div>
+        <div>Segundo intento: <span id="second-try-count">0</span></div> 
+        <div>Nivel: <span id="level">1</span></div>
+      </div>
+
+      <div id="word-area">
+        <div id="word-display">Listen to the word</div>
+        <button id="hear-btn" onclick="playWord()" title="Hear the word again">🔊</button>
+      </div>
+
+      <input id="user-input" type="text" readonly />
+
+      <div id="input-area"></div>
+
+      <div id="controls">
+        <button id="clear-btn" onclick="clearInput()">Clear</button>
+        <button id="check-btn" onclick="checkSpelling()">Check</button>
+      </div>
+    </div>
+
+    <div id="scoreboard" style="display:none">
+      <h2>Historial de palabras</h2>
+      <ul id="past-words-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    const words = [
+      "abandon", "aboriginal", "accelerator", "accolade", "accommodation", "adjudicate", "aforesaid",
+    "amnesty", "amusement", "anemone", "anniversary", "anthropology", "appraisal", "apprehensive",
+    "appropriate", "attendee", "auction", "avalanche", "awry", "baptismal", "beginning", "bicycle",
+    "bizarre", "blandish", "bleary", "blooper", "boogie-woogie", "boondoggle", "breathtaking",
+    "buffoonery", "bumblebee", "bulldozer", "buzzworthy", "camcorder", "cantankerous", "captivated",
+    "Carnation", "casserole", "cataclysmic", "catnap", "centipede", "charismatic", "charitable",
+    "chastise", "chewing gum", "cholera", "chowder", "churlish", "Cincinnati", "cinematic", "clarinet",
+    "clairvoyance", "clearance", "clover", "cockle", "comedown", "committee", "commandeer", "compelling",
+    "conch", "crumpet", "cytology", "daffodil", "daisywheel", "damnedest", "dartboard", "deaf-mute",
+    "debilitate", "deltoid", "demonstrative", "desolate", "deuterium", "dialysis", "dillydally",
+    "disappointing", "discreetly", "disproportionate", "dodecahedron", "dopamine", "dowdy", "drumlin",
+    "dystopia", "eczema", "effusive", "egg yolk", "embarrassment", "eminent", "environmentalism",
+    "epidermis", "epoch", "equinox", "equivalent", "ethanol", "eucalyptus", "evanescent", "exodus",
+    "expectorant", "extemporaneous", "fable", "faction", "Fahrenheit", "faint-hearted", "fairy tale",
+    "falsehood", "famine", "fantastically", "Fascism", "fat-free", "favouritism", "feasible",
+    "featherbrained", "fellow", "fence", "fertilizer", "festoon", "feudalism", "fiction", "filmgoer",
+    "fire engine", "fisticuffs", "flawless", "flood", "flounder", "fluctuation", "foggy", "folklore",
+    "fondle", "footloose", "forbidden", "forearm", "fragmentation", "freak", "free thinker", "fringe",
+    "frittata", "fructose", "fungicide", "furthermore", "gabble", "Gaelic", "gambling", "gangbanger",
+    "gansta rap", "gap year", "glance", "global warming", "government", "gorgeous", "greeting", "groom",
+    "guidebook", "handkerchief", "handwriting", "harbour", "hazelnut", "headache", "heart", "heater",
+    "hierarchical", "hike", "hitchhike", "honestly", "hopefully", "hotchpotch", "however", "Hungarian",
+    "Ibex", "Icelandic", "ice skating", "ichthyology", "immigration", "impressed", "indeed", "inquiry",
+    "intestines", "island", "Irishman", "jagged", "jammy", "jaundice", "jerboa", "jet lag", "jimjams",
+    "joyfulness", "jubilee", "jumada", "junkyard", "kangaroo", "kerril", "kettle", "kidney", "kinesiology",
+    "kitten", "Kyrgyzstan", "lackadaisical", "ladder", "league", "left-hand", "leisure", "licence",
+    "Liechtenstein", "litter", "lonely", "lorikeet", "luggage", "lungs", "mackerel", "magnificent",
+    "marvellous", "mathematics", "middle-aged", "moustache", "Mozambique", "muzak", "narrow", "necklace",
+    "neonatology", "nerveless", "Netherlands", "New Zealand", "niminy-piminy", "northeast", "Norway",
+    "nowhere", "numerology", "obliged", "observant", "obstruction", "obviously", "occasional", "odyssey",
+    "offbeat", "offshore", "oligarchy", "onomatopoeia", "orderly", "ornithology", "ostracize", "otherwise",
+    "paragraph", "pavement", "pedestrian", "perhaps", "Philippines", "phraseology", "physics", "Portuguese",
+    "powder", "pronounce", "pyjamas", "quake", "quantity", "Quebecois", "querulous", "questionnaire",
+    "quickstep", "quietly", "quintessence", "racketeering", "radicalism", "radicchio", "raffle", "rasher",
+    "raw", "reassess", "recidivist", "red-letter day", "refreshments", "responsible", "roast", "roundabout",
+    "Rwanda", "Scandinavian", "scarf", "scissors", "shake", "serenade", "sincerely", "sousaphone",
+    "sparkling", "Sri Lanka", "sticky", "stomach", "stroganoff", "Switzerland", "tachometer", "tactlessly",
+    "tagliatelle", "tantrum", "tattooist", "technician", "teenybopper", "tempestuous", "tenant", "Thailand",
+    "thicken", "thinly", "thoroughness", "threatening", "throughout", "timekeeper", "tinnitus", "trapezius",
+    "tutti-frutti", "Ukraine", "ulceration", "ulna", "ultrasound", "umpire", "unacceptably", "unaided",
+    "uncharted", "unconditionally", "undisclosed", "unequal", "unexpectedly", "usher", "Uzbekistan",
+    "vaccination", "vagabond", "validation", "value-added", "vandalism", "vanish", "vegetarianism", "venom",
+    "vertiginous", "vintage", "vivid", "voluminous", "vulnerability", "wallaby", "Welsh", "whirlybird",
+    "xenophobia", "X-ray", "xylem", "yammer", "yatch", "yashmak", "yellowness", "yesteryear", "yield",
+    "yippee", "zap", "zigzag", "zillion", "Zimbabwe", "Zionism", "zoologist"
+    ];
+
+    // QWERTY keyboard layout
+    const qwertyRows = [
+      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+      ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+    ];
+
+    let usedWords = new Set();
+    let currentWord = "";
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let secondTryCount = 0;
+    let tryCount = 0;
+    let level = 1;
+
+    const correctCountEl = document.getElementById("correct-count");
+    const incorrectCountEl = document.getElementById("incorrect-count");
+    const secondTryCountEl = document.getElementById("second-try-count");
+    const levelEl = document.getElementById("level");
+    const userInput = document.getElementById("user-input");
+    const wordDisplay = document.getElementById("word-display");
+    const pastWordsList = document.getElementById("past-words-list");
+    const gameContainer = document.getElementById("game-container");
+    const startScreen = document.getElementById("start-screen");
+    const scoreboard = document.getElementById("scoreboard");
+    const inputArea = document.getElementById("input-area");
+
+    let englishVoice = null;
+    function selectEnglishVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      englishVoice = voices.find(voice => voice.lang.startsWith("en")) || null;
+    }
+    window.speechSynthesis.onvoiceschanged = selectEnglishVoice;
+
+    function startGame() {
+      startScreen.style.display = "none";
+      gameContainer.style.display = "block";
+      scoreboard.style.display = "block";
+      nextWord();
+      createKeyboard();
+    }
+
+    function nextWord() {
+      tryCount = 0;
+      userInput.value = "";
+      if (usedWords.size === words.length) {
+        alert("¡Has completado todas las palabras disponibles!");
+        return;
+      }
+      do {
+        currentWord = words[Math.floor(Math.random() * words.length)].toLowerCase();
+      } while (usedWords.has(currentWord));
+      usedWords.add(currentWord);
+      wordDisplay.textContent = "Listen to the word";
+      playWord();
+    }
+
+   function playWord() {
+  const utterance = new SpeechSynthesisUtterance(currentWord);
+  const voices = window.speechSynthesis.getVoices();
+  utterance.rate = 0.5; 
+  const englishVoice = voices.find(voice =>
+    voice.lang.startsWith('en') && !voice.lang.includes('GB') // Por ejemplo, forzar US English evitando GB si quieres
+  ) || voices.find(voice => voice.lang.startsWith('en')) || null;
+  
+  if (englishVoice) {
+    utterance.voice = englishVoice;
+  }
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
+    function checkSpelling() {
+      const input = userInput.value.toLowerCase();
+      if (!input) return alert("Please enter the spelling!");
+
+      tryCount++;
+      if (input === currentWord) {
+        if (tryCount === 1) {
+          correctCount++;
+          animateScoreUpdate(correctCountEl);
+          addPastWord(currentWord, "correct");
+        } else {
+          secondTryCount++;
+          animateScoreUpdate(secondTryCountEl);
+          addPastWord(currentWord, "second-try");
+        }
+        updateHUD();
+        nextWord();
+      } else {
+        if (tryCount >= 2) {
+          incorrectCount++;
+          animateScoreUpdate(incorrectCountEl);
+          addPastWord(currentWord, "incorrect");
+          alert(`Correct spelling: ${currentWord}`);
+          updateHUD();
+          nextWord();
+        } else {
+          alert("Try again!");
+        }
+      }
+    }
+
+    function animateScoreUpdate(element) {
+      element.classList.add("score-update");
+      setTimeout(() => element.classList.remove("score-update"), 500);
+    }
+
+    function updateHUD() {
+      correctCountEl.textContent = correctCount;
+      incorrectCountEl.textContent = incorrectCount;
+      secondTryCountEl.textContent = secondTryCount;
+      level = 1 + Math.floor(correctCount / 5);
+      levelEl.textContent = level;
+    }
+
+    function clearInput() {
+      userInput.value = "";
+    }
+
+    function addLetter(letter) {
+      userInput.value += letter;
+    }
+
+    function createKeyboard() {
+      inputArea.innerHTML = "";
+      let isShiftOn = false;
+
+      qwertyRows.forEach((row, rowIndex) => {
+        const rowDiv = document.createElement("div");
+
+        // Add Mayúscula (Shift) key at the beginning of the second row (ASDF row)
+        if (rowIndex === 1) {
+          const shiftKey = document.createElement("button");
+          shiftKey.classList.add("key", "shift-key");
+          shiftKey.textContent = "Mayús";
+          shiftKey.setAttribute("data-key", "shift");
+          shiftKey.addEventListener("click", () => {
+            isShiftOn = !isShiftOn;
+            shiftKey.classList.toggle("active", isShiftOn);
+            updateKeyLabels();
+          });
+          rowDiv.appendChild(shiftKey);
+        }
+
+        // Add letter keys for the current row
+        row.forEach(letter => {
+          const key = document.createElement("button");
+          key.classList.add("key");
+          key.textContent = isShiftOn ? letter.toUpperCase() : letter;
+          key.setAttribute("data-key", letter);
+          key.addEventListener("click", () => {
+            userInput.value += isShiftOn ? letter.toUpperCase() : letter;
+            // Turn off shift after typing one letter (like real keyboards)
+            if (isShiftOn) {
+              isShiftOn = false;
+              document.querySelector('.shift-key').classList.remove("active");
+              updateKeyLabels();
+            }
+          });
+          rowDiv.appendChild(key);
+        });
+
+        inputArea.appendChild(rowDiv);
+      });
+
+      // Bottom row: hyphen and space bar
+      const bottomRow = document.createElement("div");
+
+      // Hyphen key
+      const hyphenKey = document.createElement("button");
+      hyphenKey.classList.add("key", "hyphen");
+      hyphenKey.textContent = "-";
+      hyphenKey.setAttribute("data-key", "-");
+      hyphenKey.addEventListener("click", () => {
+        userInput.value += "-";
+      });
+      bottomRow.appendChild(hyphenKey);
+
+      // Space bar
+      const spaceKey = document.createElement("button");
+      spaceKey.classList.add("key", "spacebar");
+      spaceKey.textContent = "Espacio";
+      spaceKey.setAttribute("data-key", " ");
+      spaceKey.addEventListener("click", () => {
+        userInput.value += " ";
+      });
+      bottomRow.appendChild(spaceKey);
+
+      inputArea.appendChild(bottomRow);
+
+      function updateKeyLabels() {
+        document.querySelectorAll(".key").forEach(key => {
+          const val = key.getAttribute("data-key");
+          if (!val || val === "shift" || val === " " || val === "-") return;
+          key.textContent = isShiftOn ? val.toUpperCase() : val.toLowerCase();
+        });
+      }
+    }
+
+    function addPastWord(word, status) {
+      const li = document.createElement("li");
+      li.textContent = word;
+      li.className = status;
+      pastWordsList.prepend(li);
+      if (pastWordsList.children.length > 30) {
+        pastWordsList.removeChild(pastWordsList.lastChild);
+      }
+    }
+
+    // Add keyboard event listener for physical keyboard support
+    document.addEventListener('keydown', function(event) {
+      if (gameContainer.style.display === 'none') return;
+      
+      const key = event.key.toLowerCase();
+      
+      // Handle letter keys
+      if (key.match(/[a-z]/)) {
+        userInput.value += event.shiftKey ? key.toUpperCase() : key;
+        event.preventDefault();
+      }
+      // Handle space
+      else if (key === ' ') {
+        userInput.value += ' ';
+        event.preventDefault();
+      }
+      // Handle hyphen
+      else if (key === '-') {
+        userInput.value += '-';
+        event.preventDefault();
+      }
+      // Handle backspace
+      else if (key === 'backspace') {
+        userInput.value = userInput.value.slice(0, -1);
+        event.preventDefault();
+      }
+      // Handle enter to check spelling
+      else if (key === 'enter') {
+        checkSpelling();
+        event.preventDefault();
+      }
+    });
+  </script>
+</body>
+
+</html>
